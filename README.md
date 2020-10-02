@@ -20,5 +20,6 @@ Arguments:
   -l  --list         List programs instead of grabbing their scope. Default:
                      false
   -c  --concurrency  Set concurrency. Default: 2
+  -u  --url          Also print the program URL. Default: false
 
 ```
