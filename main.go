@@ -63,7 +63,7 @@ func GetProgramPagePaths(sessionToken string, privatesOnly bool) []string {
 	return paths
 }
 
-func PrintProgramScope(url string, sessionToken string) {
+func PrintProgramScope(url string, sessionToken string, programURL bool) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Fatal(err)
@@ -80,7 +80,7 @@ func PrintProgramScope(url string, sessionToken string) {
 
 	body, _ := ioutil.ReadAll(resp.Body)
 
-	// Yeah, HTML parsing is a pain @archwhite do something damn it :D
+	// Yeah, HTML parsing is a pain @arcwhite do something damn it :D
 	// Or at least, don't break this tool aka don't change HTML stuff <3
 
 	var scope []string
@@ -90,12 +90,15 @@ func PrintProgramScope(url string, sessionToken string) {
 		log.Fatal(err)
 	}
 
-	// Find each table
 	doc.Find("#user-guides__bounty-brief__targets-table").Each(func(index int, tablehtml *goquery.Selection) {
 		tablehtml.Find("tr").Each(func(indextr int, rowhtml *goquery.Selection) {
 			rowhtml.Find("tbody td").Each(func(indexth int, tablecell *goquery.Selection) {
 				if indexth == 0 {
-					scope = append(scope, strings.TrimSpace(tablecell.Text()))
+					if programURL {
+						scope = append(scope, strings.TrimSpace(tablecell.Text())+" "+url)
+					} else {
+						scope = append(scope, strings.TrimSpace(tablecell.Text()))
+					}
 				}
 			})
 		})
@@ -113,6 +116,7 @@ func main() {
 	privateInvitesOnly := parser.Flag("p", "private", &argparse.Options{Required: false, Default: false, Help: "Only show private invites"})
 	listOnly := parser.Flag("l", "list", &argparse.Options{Required: false, Default: false, Help: "List programs instead of grabbing their scope"})
 	concurrency := parser.Int("c", "concurrency", &argparse.Options{Required: false, Default: 2, Help: "Set concurrency"})
+	programURL := parser.Flag("u", "url", &argparse.Options{Required: false, Default: false, Help: "Also print the program URL"})
 
 	err := parser.Parse(os.Args)
 	if err != nil {
@@ -141,7 +145,7 @@ func main() {
 						break
 					}
 
-					PrintProgramScope(url, *sessionToken)
+					PrintProgramScope(url, *sessionToken, *programURL)
 				}
 				processGroup.Done()
 			}()
