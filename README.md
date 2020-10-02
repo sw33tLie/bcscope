@@ -1,9 +1,14 @@
 # bcscope
 Get the scope of your bugcrowd programs!
 
-Example command:
+## Install
 ```
-go run main.go -t <YOUR-TOKEN-HERE> -c 2 -p
+go get github.com/sw33tLie/bcscope
+```
+
+## Example Command
+```
+bcscope -t <YOUR-TOKEN-HERE> -c 2 -p
 ```
 This will print all the scope of all your Bugcrowd private programs.
 Remove the -p flag to get public programs too.
