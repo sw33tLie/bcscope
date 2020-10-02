@@ -15,7 +15,7 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func GetProgramPagePaths(sessionToken string, privatesOnly bool) []string {
+func GetProgramPagePaths(sessionToken string, privatesOnly bool, bbpOnly bool) []string {
 	allProgramsCount := 0
 	currentProgramIndex := 0
 
@@ -51,7 +51,9 @@ func GetProgramPagePaths(sessionToken string, privatesOnly bool) []string {
 
 		chunkData := gjson.Get(string(body), "programs.#.program_url")
 		for i := 0; i < len(chunkData.Array()); i++ {
-			paths = append(paths, chunkData.Array()[i].Str)
+			if !bbpOnly || (bbpOnly && gjson.Get(string(body), "programs.#.reward_range_summary").Array()[i].Str != "Points") {
+				paths = append(paths, chunkData.Array()[i].Str)
+			}
 		}
 		currentProgramIndex += 25
 
@@ -115,6 +117,7 @@ func main() {
 	sessionToken := parser.String("t", "token", &argparse.Options{Required: true, Help: "Bugcrowd session token (_crowdcontrol_session)"})
 	privateInvitesOnly := parser.Flag("p", "private", &argparse.Options{Required: false, Default: false, Help: "Only show private invites"})
 	listOnly := parser.Flag("l", "list", &argparse.Options{Required: false, Default: false, Help: "List programs instead of grabbing their scope"})
+	bbpOnly := parser.Flag("b", "bbp", &argparse.Options{Required: false, Default: false, Help: "Only show programs offering monetary rewards"})
 	concurrency := parser.Int("c", "concurrency", &argparse.Options{Required: false, Default: 2, Help: "Set concurrency"})
 	programURL := parser.Flag("u", "url", &argparse.Options{Required: false, Default: false, Help: "Also print the program URL"})
 
@@ -124,7 +127,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	programPaths := GetProgramPagePaths(*sessionToken, *privateInvitesOnly)
+	programPaths := GetProgramPagePaths(*sessionToken, *privateInvitesOnly, *bbpOnly)
 
 	if *listOnly {
 		for _, path := range programPaths {

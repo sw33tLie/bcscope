@@ -19,6 +19,8 @@ Arguments:
   -p  --private      Only show private invites. Default: false
   -l  --list         List programs instead of grabbing their scope. Default:
                      false
+  -b  --bbp          Only show programs offering monetary rewards. Default:
+                     false
   -c  --concurrency  Set concurrency. Default: 2
   -u  --url          Also print the program URL. Default: false
 
