@@ -18,13 +18,14 @@ import (
 func GetProgramPagePaths(sessionToken string, privatesOnly bool, bbpOnly bool) []string {
 	allProgramsCount := 0
 	currentProgramIndex := 0
-
-	listEndpointURL := "https://bugcrowd.com/programs.json?hidden[]=false&sort[]=invited-desc&sort[]=promoted-desc&offset[]="
-
+	listEndpointURL := "https://bugcrowd.com/programs.json?"
 	if privatesOnly {
-		listEndpointURL = "https://bugcrowd.com/programs.json?accepted_invite[]=true&hidden[]=false&sort[]=invited-desc&sort[]=promoted-desc&offset[]="
+		listEndpointURL = listEndpointURL + "accepted_invite[]=true&"
 	}
-
+	if bbpOnly {
+		listEndpointURL = listEndpointURL + "points_only[]=false&"
+	}
+	listEndpointURL = listEndpointURL + "hidden[]=false&sort[]=invited-desc&sort[]=promoted-desc&offset[]="
 	paths := []string{}
 
 	for {
@@ -51,9 +52,7 @@ func GetProgramPagePaths(sessionToken string, privatesOnly bool, bbpOnly bool) [
 
 		chunkData := gjson.Get(string(body), "programs.#.program_url")
 		for i := 0; i < len(chunkData.Array()); i++ {
-			if !bbpOnly || (bbpOnly && gjson.Get(string(body), "programs.#.reward_range_summary").Array()[i].Str != "Points") {
-				paths = append(paths, chunkData.Array()[i].Str)
-			}
+			paths = append(paths, chunkData.Array()[i].Str)
 		}
 		currentProgramIndex += 25
 
