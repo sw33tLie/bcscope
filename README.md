@@ -1,3 +1,6 @@
+# WARNING: DEPRECATED TOOL!
+Use https://github.com/sw33tLie/bbscope
+
 # bcscope
 Get the scope of your bugcrowd programs!
 
